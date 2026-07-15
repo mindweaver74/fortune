@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>운세가 궁금하지? — 생년월일로 보는 오늘의 운세·행운 로또 번호</title>
+<meta name="description" content="생년월일만 넣으면 오늘의 총운, 금전운·애정운·건강운, 행운의 로또 번호까지 한 장의 카드로! 매일 바뀌는 나만의 운세를 이미지로 저장하고 친구와 공유하세요.">
+<link rel="canonical" href="https://mindweaver74.github.io/fortune">
+<meta property="og:title" content="운세가 궁금하지? — 오늘의 운세 카드">
+<meta property="og:description" content="생년월일로 보는 오늘의 총운·금전운·애정운·건강운 + 행운의 로또 번호. 매일 바뀌는 나만의 운세 카드!">
+<meta property="og:url" content="https://mindweaver74.github.io/fortune">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jutopia Games">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="운세가 궁금하지? — 오늘의 운세 카드">
+<meta name="twitter:description" content="생년월일로 보는 오늘의 운세와 행운의 로또 번호. 매일 바뀌는 나만의 운세 카드!">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "운세가 궁금하지?",
+  "url": "https://mindweaver74.github.io/fortune",
+  "applicationCategory": "EntertainmentApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
+  "description": "생년월일로 보는 오늘의 총운, 분야별 운세, 행운의 로또 번호 생성 도구"
+}
+</script>
+<style>
+  :root{
+    --bg:#0b0e1a; --bg2:#121730; --panel:#181e3a; --panel2:#1f2749;
+    --line:#2b3560; --text:#eef1ff; --dim:#8b93b8;
+    --gold:#f5c542; --gold2:#c99a1e; --mystic:#a78bfa;
+    --ball-y:#fbc400; --ball-b:#69c8f2; --ball-r:#ff7272; --ball-g4:#aaaaaa; --ball-g5:#b0d840;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+    background:radial-gradient(1100px 560px at 50% -10%, #1a2350 0%, var(--bg) 62%);
+    color:var(--text); min-height:100vh; padding:26px 16px 60px;
+  }
+  .wrap{max-width:520px;margin:0 auto;}
+
+  header{text-align:center;margin-bottom:22px;}
+  .brand{font-size:11px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+  h1{font-size:clamp(28px,7vw,38px);font-weight:800;letter-spacing:-1px;line-height:1.2;}
+  h1 .q{color:var(--gold);}
+  .today{margin-top:10px;font-size:13px;color:var(--dim);}
+
+  .inputs{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:18px;display:flex;flex-direction:column;gap:12px;margin-bottom:22px;
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .field{flex:1;min-width:140px;display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:12px;color:var(--dim);}
+  .field input,.field select{
+    background:var(--bg2);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);padding:11px 12px;font-size:15px;outline:none;width:100%;
+    font-family:inherit;
+  }
+  .field input:focus,.field select:focus{border-color:var(--gold);}
+  #revealBtn{
+    font-family:inherit;font-size:17px;font-weight:800;letter-spacing:2px;
+    padding:15px;border-radius:12px;border:none;cursor:pointer;color:#1a1200;
+    background:linear-gradient(180deg,var(--gold),var(--gold2));
+    box-shadow:0 6px 20px rgba(245,197,66,.3);
+    transition:transform .12s;
+  }
+  #revealBtn:hover{transform:translateY(-2px);}
+  #revealBtn:focus-visible{outline:3px solid #fff;outline-offset:2px;}
+
+  /* ===== 시그니처: 운세 카드 플립 ===== */
+  .stage{perspective:1200px;margin-bottom:18px;}
+  .card{
+    position:relative;width:100%;min-height:520px;
+    transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.9,.3,1);
+  }
+  .card.flipped{transform:rotateY(180deg);}
+  .face{
+    position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;overflow:hidden;
+  }
+  /* 카드 뒷면 (뒤집기 전) */
+  .back{
+    background:
+      radial-gradient(circle at 50% 32%, rgba(167,139,250,.25), transparent 55%),
+      linear-gradient(160deg,#1c2350,#12162e);
+    border:1px solid #3a3f78;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;cursor:pointer;
+  }
+  .back .orb{
+    font-size:74px;
+    animation:float 3.2s ease-in-out infinite;
+    filter:drop-shadow(0 0 22px rgba(167,139,250,.55));
+  }
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .back .hint{color:var(--mystic);font-size:15px;font-weight:700;letter-spacing:1px;}
+  .back .sub{color:var(--dim);font-size:12px;}
+  .back .stars{position:absolute;inset:0;pointer-events:none;}
+  .back .stars span{position:absolute;color:rgba(238,241,255,.5);animation:tw 2.4s infinite;}
+  @keyframes tw{0%,100%{opacity:.2}50%{opacity:.9}}
+
+  /* 카드 앞면 (결과) */
+  .front{
+    transform:rotateY(180deg);
+    background:linear-gradient(170deg,#20284f,#151a38);
+    border:1px solid var(--gold2);
+    padding:24px 20px;display:none;flex-direction:column;gap:14px;
+  }
+  .card.flipped .front{display:flex;}
+  .f-head{text-align:center;}
+  .f-date{font-size:12px;color:var(--dim);letter-spacing:1px;margin-bottom:6px;}
+  .f-emoji{font-size:52px;line-height:1;margin-bottom:6px;}
+  .f-grade{font-size:14px;color:var(--gold);font-weight:800;letter-spacing:3px;}
+  .f-score{font-size:40px;font-weight:800;letter-spacing:-1px;}
+  .f-score small{font-size:15px;color:var(--dim);font-weight:400;}
+  .f-main{
+    text-align:center;font-size:16px;line-height:1.7;color:var(--text);
+    padding:12px 8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+  .cat{display:flex;align-items:baseline;gap:10px;font-size:14px;}
+  .cat .nm{flex-shrink:0;width:64px;font-weight:700;}
+  .cat .st{flex-shrink:0;color:var(--gold);letter-spacing:2px;font-size:13px;}
+  .cat .st .off{color:#3a4470;}
+  .cat .tx{color:var(--dim);line-height:1.55;font-size:13px;}
+  .lotto{text-align:center;padding-top:4px;}
+  .lotto .lb{font-size:12px;color:var(--dim);margin-bottom:10px;letter-spacing:1px;}
+  .balls{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;}
+  .ball{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:15px;color:#222;
+    box-shadow:inset -3px -5px 8px rgba(0,0,0,.28), inset 3px 5px 8px rgba(255,255,255,.55), 0 3px 6px rgba(0,0,0,.4);
+    transform:scale(0);animation:pop .4s cubic-bezier(.2,1.6,.4,1) forwards;
+  }
+  @keyframes pop{to{transform:scale(1)}}
+  .b1{background:var(--ball-y);} .b2{background:var(--ball-b);}
+  .b3{background:var(--ball-r);color:#fff;} .b4{background:var(--ball-g4);} .b5{background:var(--ball-g5);}
+
+  .actions{display:flex;gap:10px;}
+  .actions button{
+    flex:1;font-family:inherit;font-size:14px;font-weight:700;padding:13px;
+    border-radius:12px;cursor:pointer;transition:transform .12s;
+  }
+  .actions button:hover{transform:translateY(-2px);}
+  #saveBtn{border:none;color:#1a1200;background:linear-gradient(180deg,var(--gold),var(--gold2));}
+  #resetBtn{background:none;border:1px solid var(--line);color:var(--dim);}
+  #resetBtn:hover{color:var(--text);border-color:#3d4a85;}
+  .actions.hidden,.stage.hidden{display:none;}
+
+  footer{margin-top:34px;text-align:center;font-size:12px;color:var(--dim);line-height:1.9;}
+  footer a{color:var(--dim);}
+  footer a:hover{color:var(--text);}
+
+  @media (prefers-reduced-motion: reduce){
+    .card{transition:none;}
+    .back .orb,.back .stars span{animation:none;}
+    .ball{animation:none;transform:scale(1);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">Jutopia Tools</div>
+    <h1>운세가 <span class="q">궁금하지?</span></h1>
+    <div class="today" id="todayLabel"></div>
+  </header>
+
+  <div class="inputs" id="inputBox">
+    <div class="row">
+      <div class="field">
+        <label for="birth">생년월일</label>
+        <input type="date" id="birth">
+      </div>
+      <div class="field">
+        <label for="calType">양력 / 음력</label>
+        <select id="calType">
+          <option value="solar" selected>양력</option>
+          <option value="lunar">음력</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="userName">이름 (선택 — 넣으면 더 나만의 운세가 됩니다)</label>
+      <input type="text" id="userName" placeholder="예: 주열" maxlength="12">
+    </div>
+    <button id="revealBtn">오늘 운세 카드 뽑기</button>
+  </div>
+
+  <div class="stage hidden" id="stage">
+    <div class="card" id="card">
+      <div class="face back" id="cardBack" role="button" tabindex="0" aria-label="카드를 뒤집어 운세 보기">
+        <div class="stars" id="starField"></div>
+        <div class="orb">🔮</div>
+        <div class="hint">카드를 탭해서 뒤집어 보세요</div>
+        <div class="sub">오늘 하루, 당신에게 온 카드입니다</div>
+      </div>
+      <div class="face front" id="cardFront"></div>
+    </div>
+  </div>
+
+  <div class="actions hidden" id="actions">
+    <button id="saveBtn">📷 이미지 저장</button>
+    <button id="resetBtn">다른 사람 운세 보기</button>
+  </div>
+
+  <footer>
+    이 운세는 재미로 즐기는 콘텐츠입니다. 오늘 하루의 작은 웃음이 되길 바라요 🍀<br>
+    로또 번호의 모든 조합은 당첨 확률이 동일합니다.<br>
+    <a href="https://mindweaver74.github.io/Jutopia/">🎮 Jutopia 게임 목록</a> ·
+    <a href="https://mindweaver74.github.io/Jutopia/privacy.html">개인정보처리방침</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 안전 저장소 ---------- */
+  var mem = {};
+  var store = {
+    get:function(k){ try{ var v=localStorage.getItem(k); return v!==null?v:(mem[k]||null);}catch(e){return mem[k]||null;} },
+    set:function(k,v){ mem[k]=v; try{ localStorage.setItem(k,v);}catch(e){} }
+  };
+
+  /* ---------- 날짜 ---------- */
+  var now = new Date();
+  var DAYS = ["일","월","화","수","목","금","토"];
+  var todayStr = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  var todayLabel = now.getFullYear()+"년 "+(now.getMonth()+1)+"월 "+now.getDate()+"일 ("+DAYS[now.getDay()]+") 오늘의 카드";
+  document.getElementById("todayLabel").textContent = todayLabel;
+
+  /* ---------- 시드 ---------- */
+  function fnv1a(str){
+    var h=2166136261;
+    for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); }
+    return h>>>0;
+  }
+  function mulberry32(seed){
+    return function(){
+      seed|=0; seed=(seed+0x6D2B79F5)|0;
+      var t=Math.imul(seed^(seed>>>15),1|seed);
+      t=(t+Math.imul(t^(t>>>7),61|t))^t;
+      return ((t^(t>>>14))>>>0)/4294967296;
+    };
+  }
+
+  /* ---------- 오행 ---------- */
+  var ELEM=["수","목","목","화","화","토","토","금","금","수"];
+  var STEM_ELEM=["금","금","수","수","목","목","화","화","토","토"];
+  var BORN_FROM={"화":"목","토":"화","금":"토","수":"금","목":"수"};
+  var SANGSAENG={"목":"화","화":"토","토":"금","금":"수","수":"목"};
+
+  function myElement(birthStr, calType){
+    var y=parseInt(birthStr.slice(0,4),10)||1980;
+    var m=parseInt(birthStr.slice(5,7),10)||6;
+    var d=parseInt(birthStr.slice(8,10),10)||1;
+    if(calType!=="lunar" && (m<2||(m===2&&d<4))) y-=1; // 양력 입춘 보정
+    return STEM_ELEM[y%10];
+  }
+
+  function pickLotto(rng, el){
+    var l1=BORN_FROM[el], l2=SANGSAENG[el];
+    var pool=[];
+    for(var n=1;n<=45;n++){
+      var e=ELEM[n%10];
+      pool.push({n:n,w:(e===l1)?3:(e===l2)?2:(e===el)?1.5:1});
+    }
+    var out=[];
+    while(out.length<6){
+      var total=pool.reduce(function(s,p){return s+p.w;},0);
+      var r=rng()*total,acc=0,idx=0;
+      for(var i=0;i<pool.length;i++){acc+=pool[i].w;if(r<=acc){idx=i;break;}}
+      out.push(pool[idx].n); pool.splice(idx,1);
+    }
+    return out.sort(function(a,b){return a-b;});
+  }
+  function ballClass(n){return n<=10?"b1":n<=20?"b2":n<=30?"b3":n<=40?"b4":"b5";}
+
+  /* ---------- 문구 풀 (유쾌한 톤) ---------- */
+  var MAIN = {
+    "대길": [
+      "오늘은 뭘 해도 되는 날. 복권 대신 상사에게 연차 결재를 올려도 통과될 기세입니다.",
+      "우주가 오늘 당신 편입니다. 평소 미뤄둔 부탁, 오늘 하세요.",
+      "길을 걷다 돈을 주울 확률보다 좋은 일이 먼저 찾아올 확률이 높은 날.",
+      "오늘의 당신, 주인공 보정 받는 중. 카메오들이 알아서 도와줍니다.",
+      "엘리베이터가 기다렸다는 듯 열리는 하루. 타이밍의 신이 함께합니다.",
+      "오늘 산 물건은 후회가 없습니다. 단, 장바구니 총액은 확인하세요.",
+      "누군가 당신 칭찬을 하고 다닙니다. 어깨가 으쓱해져도 됩니다.",
+      "막혔던 일이 스르륵 풀립니다. 오늘은 밀린 숙제 처리하기 최적의 날.",
+      "웃는 얼굴에 복이 배달됩니다. 오늘은 문 앞까지 옵니다.",
+      "생각지 못한 곳에서 좋은 소식이 옵니다. 알림을 꺼두지 마세요.",
+      "오늘의 운은 저금이 안 됩니다. 아낌없이 쓰세요.",
+      "무엇을 시작하든 첫 단추가 잘 끼워지는 날. 미뤄둔 시작, 오늘입니다."
+    ],
+    "길": [
+      "전반적으로 순풍. 노를 젓는 만큼 나아가는 정직한 하루입니다.",
+      "작은 행운이 두세 번 나눠서 옵니다. 놓치지 말고 다 주우세요.",
+      "오늘은 평타 이상. 욕심을 한 스푼만 얹으면 딱 좋습니다.",
+      "귀인이 근처에 있습니다. 오늘따라 친절한 그 사람, 맞습니다.",
+      "일이 술술 풀리진 않아도 꼬이지도 않는 날. 이게 사실 제일 좋은 겁니다.",
+      "점심 메뉴 선택이 성공하는 날. 그 기세로 다른 결정도 밀어붙이세요.",
+      "노력한 만큼 돌아오는 하루. 오늘의 성실함은 이자가 붙습니다.",
+      "기분 좋은 우연이 한 번 옵니다. 오면 아는 척해 주세요.",
+      "오늘의 컨디션, 상위 30%. 무리하지 않는 선에서 즐기세요.",
+      "작게 베푼 친절이 크게 돌아오는 날입니다.",
+      "미소가 무기인 하루. 오늘은 웃는 쪽이 이깁니다.",
+      "평소보다 반 박자 빠르게 움직이면 좋은 일이 따라붙습니다."
+    ],
+    "보통": [
+      "무난한 하루. 대박도 쪽박도 없는, 어찌 보면 가장 평화로운 날입니다.",
+      "오늘은 현상 유지가 승리입니다. 새 일은 내일의 나에게 양보하세요.",
+      "커피 한 잔의 여유가 오늘의 최고 이벤트일 수 있습니다. 그거면 충분해요.",
+      "운세 그래프가 수평선. 흔들리지 않는 편안함이라고 해두죠.",
+      "특별한 일이 없다는 건 나쁜 일도 없다는 뜻. 오늘은 그런 날입니다.",
+      "무리한 도전보다 익숙한 루틴이 잘 맞는 하루입니다.",
+      "오늘의 키워드는 '적당히'. 적당히 일하고 적당히 쉬세요.",
+      "기대치를 살짝 낮추면 만족도가 올라가는 날입니다.",
+      "큰 결정은 미루고, 작은 정리를 하기 좋은 날. 서랍부터 시작해 보세요.",
+      "오늘은 관망의 날. 흐름을 지켜보다가 내일 움직이세요.",
+      "평범함 속에 소소한 재미가 숨어 있습니다. 찾는 사람에게만 보여요.",
+      "에너지 절약 모드 추천. 내일을 위한 충전의 날입니다."
+    ],
+    "주의": [
+      "오늘은 돌다리를 두드리고, 두드린 김에 한 번 더 두드리는 날입니다.",
+      "말 한마디가 씨가 되는 날. 오늘의 침묵은 금보다 비쌉니다.",
+      "충동구매 경보 발령. 장바구니에 넣고 24시간 숙성시키세요.",
+      "오늘은 서두를수록 꼬입니다. 5분 일찍 출발이 만병통치약.",
+      "지갑과 우산, 오늘은 둘 다 챙기세요. 하나는 꼭 쓸 일이 생깁니다.",
+      "사소한 오해가 생기기 쉬운 날. 문자보다 전화가 안전합니다.",
+      "오늘의 '아 몰라 대충'은 내일의 야근이 됩니다. 조금만 꼼꼼히.",
+      "컨디션 저기압. 무리한 약속은 정중히 다음으로 미루세요.",
+      "오늘은 방어 운전, 방어 대화, 방어 소비의 날입니다.",
+      "실수해도 괜찮습니다. 다만 두 번은 하지 마세요. 오늘은 특히요.",
+      "낮은 확률의 불운이 어슬렁거리는 날. 침착함이 최고의 부적입니다.",
+      "일이 좀 꼬여도 저녁엔 풀립니다. 저녁밥을 맛있는 걸로 예약해 두세요."
+    ]
+  };
+
+  var CATS = {
+    "금전운": {
+      low: [
+        "지갑이 열리려 할 때마다 이 문구를 떠올리세요: '그거 꼭 필요해?'",
+        "오늘의 최고 재테크는 지출 안 하기입니다.",
+        "할인이라는 단어를 조심하세요. 안 사면 100% 할인입니다.",
+        "더치페이 계산은 오늘 두 번 확인하세요.",
+        "무료체험 구독 버튼이 당신을 노리고 있습니다.",
+        "오늘 뽑기·가챠 운은 잠들어 있습니다. 내일을 기약하세요.",
+        "작은 지출이 모여 큰 한숨이 되는 날. 가계부가 무기입니다."
+      ],
+      mid: [
+        "들어올 돈은 들어오고 나갈 돈은 나가는 평화로운 흐름입니다.",
+        "커피 한 잔 정도의 소확행 지출은 오늘의 활력소가 됩니다.",
+        "점심 내기는 피하되, 점심 메뉴 운은 좋습니다.",
+        "저축 계획을 세우기 좋은 날. 실행은 월급날에.",
+        "가격 비교 3분이 치킨값을 아껴주는 날입니다.",
+        "돈보다 정보가 들어오는 날. 그 정보가 나중에 돈이 됩니다.",
+        "지출과 수입이 사이좋게 악수하는 하루입니다."
+      ],
+      high: [
+        "생각지 못한 돈이 발견되는 날. 겨울 코트 주머니를 확인해 보세요.",
+        "오늘 흥정은 당신이 이깁니다. 자신 있게 '조금만 깎아주세요'.",
+        "금전 감각이 최고조. 오늘 세운 소비 계획은 믿어도 됩니다.",
+        "환급·페이백·포인트가 당신을 찾아오는 날입니다.",
+        "오늘 산 물건, 나중에 '그때 사길 잘했다'가 됩니다.",
+        "부수입의 씨앗이 뿌려지는 날. 아이디어를 메모해 두세요.",
+        "지갑에 순풍이 붑니다. 다만 돛을 너무 활짝 펴진 마세요."
+      ]
+    },
+    "애정운": {
+      low: [
+        "오늘은 티키타카보다 티키'만' 하고 멈추는 게 안전합니다.",
+        "농담이 오해가 되기 쉬운 날. 이모티콘을 아끼지 마세요.",
+        "상대의 '괜찮아'는 괜찮지 않다는 뜻일 수 있습니다. 오늘은 특히.",
+        "썸의 진도는 오늘 쉬어갑니다. 무리한 직진은 급브레이크를 부릅니다.",
+        "말보다 경청이 점수를 따는 날입니다.",
+        "옛 연락처를 들여다보고 싶은 날이지만, 참으면 이깁니다.",
+        "혼자만의 시간이 오히려 매력을 충전해 주는 날입니다."
+      ],
+      mid: [
+        "잔잔한 호수 같은 애정운. 돌을 던지지만 않으면 평화롭습니다.",
+        "안부 연락 한 통이 관계의 온도를 1도 올려줍니다.",
+        "오늘의 다정함은 적금처럼 쌓입니다. 만기일에 크게 돌아와요.",
+        "함께 먹는 밥이 어떤 이벤트보다 효과적인 날입니다.",
+        "칭찬 한마디가 오늘의 필살기. 구체적일수록 좋습니다.",
+        "무소식이 희소식인 하루. 조급해하지 마세요.",
+        "웃긴 짤 하나가 열 마디 안부보다 잘 통하는 날입니다."
+      ],
+      high: [
+        "오늘의 당신, 평소보다 1.5배 매력적으로 보입니다. 과학입니다.",
+        "고백·화해·부탁, 뭐든 통하는 날. 준비된 말이 있다면 오늘 하세요.",
+        "우연한 만남에 설렘이 숨어 있는 날. 후줄근한 옷은 피하세요.",
+        "상대의 마음이 열려 있습니다. 노크만 하면 됩니다.",
+        "오늘 잡은 약속은 좋은 기억이 됩니다. 망설이지 말고 잡으세요.",
+        "다툼도 오늘 풀면 전화위복이 됩니다. 먼저 손 내미는 쪽이 승자.",
+        "당신의 유머가 유난히 잘 먹히는 날입니다. 아재개그도 통과됩니다."
+      ]
+    },
+    "건강운": {
+      low: [
+        "몸이 보내는 '피곤해' 신호를 읽어주세요. 오늘은 일찍 잡시다.",
+        "야식의 유혹이 강한 날. 냉장고와 눈을 마주치지 마세요.",
+        "목과 어깨가 파업 직전입니다. 한 시간에 한 번 기지개를.",
+        "오늘의 커피는 두 잔까지만. 세 잔째부터는 심장이 항의합니다.",
+        "계단보다 엘리베이터가 나은 날도 있습니다. 오늘이 그날.",
+        "무리한 운동보다 가벼운 산책이 약이 되는 날입니다.",
+        "몸이 무거운 건 기분 탓이 아닙니다. 오늘은 쉬는 게 실력입니다."
+      ],
+      mid: [
+        "물 여덟 잔이 오늘의 보약입니다. 지금 한 잔 마시고 시작하세요.",
+        "컨디션 무난. 자기 전 스트레칭 5분이 내일을 바꿉니다.",
+        "점심 후 10분 산책이 오후의 졸음을 데려갑니다.",
+        "평소 루틴을 지키는 것만으로 충분한 하루입니다.",
+        "몸도 마음도 중간 지점. 무리도 말고 방심도 마세요.",
+        "일찍 자면 내일의 운세가 한 등급 올라갑니다. 진짜로요.",
+        "가벼운 몸풀기가 뜻밖의 개운함을 선물하는 날입니다."
+      ],
+      high: [
+        "에너지 만렙. 미뤄둔 운동 시작하기 딱 좋은 날입니다.",
+        "몸이 가볍고 머리가 맑은 날. 어려운 일을 오전에 배치하세요.",
+        "오늘 흘린 땀은 두 배로 보상받습니다. 운동화 끈을 묶으세요.",
+        "회복력이 좋은 날. 피로가 쌓여 있었다면 오늘 다 풀립니다.",
+        "발걸음이 가벼운 하루. 한 정거장 먼저 내려 걸어보세요.",
+        "숙면 예약된 밤입니다. 자기 전 휴대폰만 멀리 두세요.",
+        "몸이 시키는 대로 하면 다 맞는 날. 본능을 믿으세요."
+      ]
+    }
+  };
+
+  var GRADES=[
+    {min:85,name:"대길",emoji:"🌟",label:"DAEGIL"},
+    {min:65,name:"길",emoji:"😊",label:"GIL"},
+    {min:45,name:"보통",emoji:"😌",label:"BOTONG"},
+    {min:0,name:"주의",emoji:"🌧️",label:"CAUTION"}
+  ];
+
+  /* ---------- 운세 생성 ---------- */
+  var current=null;
+
+  function generate(birth, cal, name){
+    var seedKey=birth+"|"+cal+"|"+(name||"")+"|"+todayStr;
+    var rng=mulberry32(fnv1a(seedKey));
+    var score=Math.round((rng()+rng()+rng())/3*72+28);
+    var grade=GRADES.find(function(g){return score>=g.min;});
+    var main=MAIN[grade.name][Math.floor(rng()*MAIN[grade.name].length)];
+    var base=Math.max(1,Math.min(5,Math.round(score/20)));
+    var cats=Object.keys(CATS).map(function(cn){
+      var stars=Math.max(1,Math.min(5, base+Math.floor(rng()*5)-2));
+      var tier=stars<=2?"low":stars===3?"mid":"high";
+      var pool=CATS[cn][tier];
+      return {name:cn, stars:stars, text:pool[Math.floor(rng()*pool.length)]};
+    });
+    var el=myElement(birth,cal);
+    var lotto=pickLotto(rng, el);
+    return {score:score, grade:grade, main:main, cats:cats, lotto:lotto, name:name};
+  }
+
+  /* ---------- 렌더 ---------- */
+  var CAT_ICONS={"금전운":"💰","애정운":"❤️","건강운":"🍀"};
+
+  function renderFront(f){
+    var el=document.getElementById("cardFront");
+    var html='<div class="f-head">'
+      +'<div class="f-date">'+todayLabel+(f.name?' · '+escapeHtml(f.name)+'님':'')+'</div>'
+      +'<div class="f-emoji">'+f.grade.emoji+'</div>'
+      +'<div class="f-grade">'+f.grade.name+'</div>'
+      +'<div class="f-score">'+f.score+'<small> / 100</small></div>'
+      +'</div>'
+      +'<div class="f-main">'+escapeHtml(f.main)+'</div>';
+    f.cats.forEach(function(c){
+      var st='';
+      for(var i=1;i<=5;i++) st+= i<=c.stars ? '★' : '<span class="off">★</span>';
+      html+='<div class="cat"><span class="nm">'+CAT_ICONS[c.name]+' '+c.name+'</span>'
+          +'<span class="st">'+st+'</span>'
+          +'<span class="tx">'+escapeHtml(c.text)+'</span></div>';
+    });
+    html+='<div class="lotto"><div class="lb">🎱 오늘의 행운 번호 (오행 상생)</div><div class="balls">';
+    f.lotto.forEach(function(n,i){
+      html+='<div class="ball '+ballClass(n)+'" style="animation-delay:'+(0.9+i*0.12)+'s">'+n+'</div>';
+    });
+    html+='</div></div>';
+    el.innerHTML=html;
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* 별 반짝임 배치 */
+  (function(){
+    var sf=document.getElementById("starField");
+    for(var i=0;i<14;i++){
+      var s=document.createElement("span");
+      s.textContent="✦";
+      s.style.left=(5+Math.random()*90)+"%";
+      s.style.top=(5+Math.random()*90)+"%";
+      s.style.fontSize=(8+Math.random()*8)+"px";
+      s.style.animationDelay=(Math.random()*2.4)+"s";
+      sf.appendChild(s);
+    }
+  })();
+
+  /* ---------- 흐름 ---------- */
+  var stage=document.getElementById("stage");
+  var card=document.getElementById("card");
+  var actions=document.getElementById("actions");
+  var inputBox=document.getElementById("inputBox");
+
+  // 저장된 입력 복원
+  var saved={};
+  try{ saved=JSON.parse(store.get("fortune_me")||"{}"); }catch(e){}
+  if(saved.birth) document.getElementById("birth").value=saved.birth;
+  if(saved.cal) document.getElementById("calType").value=saved.cal;
+  if(saved.name) document.getElementById("userName").value=saved.name;
+
+  document.getElementById("revealBtn").addEventListener("click",function(){
+    var birth=document.getElementById("birth").value;
+    if(!birth){ alert("생년월일을 입력해 주세요!"); return; }
+    var cal=document.getElementById("calType").value;
+    var name=document.getElementById("userName").value.trim();
+    store.set("fortune_me",JSON.stringify({birth:birth,cal:cal,name:name}));
+    current=generate(birth,cal,name);
+    renderFront(current);
+    inputBox.style.display="none";
+    stage.classList.remove("hidden");
+    card.classList.remove("flipped");
+    actions.classList.add("hidden");
+    card.scrollIntoView({behavior:"smooth",block:"center"});
+  });
+
+  function flip(){
+    if(card.classList.contains("flipped")) return;
+    card.classList.add("flipped");
+    setTimeout(function(){ actions.classList.remove("hidden"); },700);
+  }
+  document.getElementById("cardBack").addEventListener("click",flip);
+  document.getElementById("cardBack").addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===" "){e.preventDefault();flip();}
+  });
+
+  document.getElementById("resetBtn").addEventListener("click",function(){
+    stage.classList.add("hidden");
+    actions.classList.add("hidden");
+    card.classList.remove("flipped");
+    inputBox.style.display="";
+    document.getElementById("userName").value="";
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  /* ---------- Canvas 이미지 저장 (1080×1350) ---------- */
+  var BALL_COLORS={b1:"#fbc400",b2:"#69c8f2",b3:"#ff7272",b4:"#aaaaaa",b5:"#b0d840"};
+
+  function wrapText(ctx,text,maxWidth){
+    var words=text.split(" "),lines=[],line="";
+    words.forEach(function(w){
+      var test=line?line+" "+w:w;
+      if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=w;}
+      else line=test;
+    });
+    if(line)lines.push(line);
+    return lines;
+  }
+
+  document.getElementById("saveBtn").addEventListener("click",function(){
+    if(!current)return;
+    var W=1080,H=1350;
+    var cv=document.createElement("canvas");
+    cv.width=W;cv.height=H;
+    var ctx=cv.getContext("2d");
+
+    // 배경
+    var bg=ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,"#1a2350");bg.addColorStop(0.55,"#0b0e1a");bg.addColorStop(1,"#0b0e1a");
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+    // 카드 테두리
+    ctx.strokeStyle="#c99a1e";ctx.lineWidth=4;
+    roundRect(ctx,50,50,W-100,H-100,32);ctx.stroke();
+
+    ctx.textAlign="center";
+    var f=current;
+
+    // 타이틀
+    ctx.fillStyle="#f5c542";
+    ctx.font="700 34px 'Malgun Gothic',sans-serif";
+    ctx.fillText("운세가 궁금하지?",W/2,140);
+    ctx.fillStyle="#8b93b8";
+    ctx.font="28px 'Malgun Gothic',sans-serif";
+    ctx.fillText(todayLabel+(f.name?" · "+f.name+"님":""),W/2,190);
+
+    // 등급
+    ctx.font="150px sans-serif";
+    ctx.fillText(f.grade.emoji,W/2,360);
+    ctx.fillStyle="#f5c542";
+    ctx.font="800 46px 'Malgun Gothic',sans-serif";
+    ctx.fillText(f.grade.name,W/2,430);
+    ctx.fillStyle="#eef1ff";
+    ctx.font="800 88px 'Malgun Gothic',sans-serif";
+    ctx.fillText(f.score+"점",W/2,530);
+
+    // 구분선
+    ctx.strokeStyle="#2b3560";ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(120,575);ctx.lineTo(W-120,575);ctx.stroke();
+
+    // 총운 문구
+    ctx.fillStyle="#eef1ff";
+    ctx.font="34px 'Malgun Gothic',sans-serif";
+    var lines=wrapText(ctx,f.main,W-240);
+    var y=635;
+    lines.forEach(function(l){ctx.fillText(l,W/2,y);y+=50;});
+
+    // 분야별
+    y=Math.max(y+30,790);
+    ctx.textAlign="left";
+    f.cats.forEach(function(c){
+      ctx.fillStyle="#eef1ff";
+      ctx.font="700 34px 'Malgun Gothic',sans-serif";
+      ctx.fillText(CAT_ICONS[c.name]+" "+c.name,130,y);
+      ctx.fillStyle="#f5c542";
+      ctx.font="34px sans-serif";
+      var stars="";
+      for(var i=1;i<=5;i++)stars+=i<=c.stars?"★":"☆";
+      ctx.fillText(stars,340,y);
+      ctx.fillStyle="#8b93b8";
+      ctx.font="26px 'Malgun Gothic',sans-serif";
+      var subLines=wrapText(ctx,c.text,W-260);
+      var sub=(subLines[0]||"")+(subLines.length>1?"…":"");
+      ctx.fillText(sub,130,y+40);
+      y+=105;
+    });
+
+    // 로또
+    ctx.textAlign="center";
+    ctx.fillStyle="#8b93b8";
+    ctx.font="28px 'Malgun Gothic',sans-serif";
+    ctx.fillText("🎱 오늘의 행운 번호",W/2,y+20);
+    var bw=100,gap=26,total=6*bw+5*gap,sx=(W-total)/2+bw/2,by=y+110;
+    f.lotto.forEach(function(n,i){
+      var cx=sx+i*(bw+gap);
+      var cls=ballClass(n);
+      var g=ctx.createRadialGradient(cx-14,by-16,8,cx,by,bw/2);
+      g.addColorStop(0,"rgba(255,255,255,.8)");g.addColorStop(0.25,BALL_COLORS[cls]);g.addColorStop(1,shade(BALL_COLORS[cls],-25));
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(cx,by,bw/2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=cls==="b3"?"#fff":"#222";
+      ctx.font="800 40px 'Malgun Gothic',sans-serif";
+      ctx.fillText(n,cx,by+14);
+    });
+
+    // 워터마크
+    ctx.fillStyle="#8b93b8";
+    ctx.font="24px 'Malgun Gothic',sans-serif";
+    ctx.fillText("재미로 즐겨주세요 🍀  jutopia · mindweaver74.github.io/fortune",W/2,H-90);
+
+    var a=document.createElement("a");
+    a.download="fortune_"+todayStr+".png";
+    a.href=cv.toDataURL("image/png");
+    a.click();
+  });
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+  function shade(hex,pct){
+    var n=parseInt(hex.slice(1),16),
+        r=Math.max(0,Math.min(255,(n>>16)+pct)),
+        g=Math.max(0,Math.min(255,((n>>8)&255)+pct)),
+        b=Math.max(0,Math.min(255,(n&255)+pct));
+    return "rgb("+r+","+g+","+b+")";
+  }
+})();
+</script>
+</body>
+</html>
