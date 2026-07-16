@@ -60,14 +60,19 @@
     font-family:inherit;
   }
   .field input:focus,.field select:focus{border-color:var(--gold);}
-  .birth-row{display:flex;align-items:center;gap:6px;}
+  .birth-row{display:flex;align-items:center;gap:6px;width:100%;}
   .birth-row input{
-    text-align:center;padding:11px 4px;
+    text-align:center;padding:11px 2px;
     font-variant-numeric:tabular-nums;
+    min-width:0;
   }
-  #bYear{flex:1.6;min-width:74px;}
-  #bMonth,#bDay{flex:1;min-width:48px;}
+  #bYear{flex:1.7;}
+  #bMonth,#bDay{flex:1;}
   .bu{color:var(--dim);font-size:14px;flex-shrink:0;}
+  @media (max-width:380px){
+    .row{flex-direction:column;}
+    .row .field{flex:1 1 auto !important;min-width:0;}
+  }
   #revealBtn{
     font-family:inherit;font-size:17px;font-weight:800;letter-spacing:2px;
     padding:15px;border-radius:12px;border:none;cursor:pointer;color:#1a1200;
@@ -187,29 +192,29 @@
   </header>
 
   <div class="inputs" id="inputBox">
-    <div class="row">
-      <div class="field" style="flex:2.2;">
-        <label for="bYear">생년월일 (숫자로 직접 입력)</label>
-        <div class="birth-row">
-          <input type="tel" id="bYear" inputmode="numeric" placeholder="1974" maxlength="4" aria-label="태어난 해 4자리">
-          <span class="bu">년</span>
-          <input type="tel" id="bMonth" inputmode="numeric" placeholder="1" maxlength="2" aria-label="태어난 월">
-          <span class="bu">월</span>
-          <input type="tel" id="bDay" inputmode="numeric" placeholder="15" maxlength="2" aria-label="태어난 일">
-          <span class="bu">일</span>
-        </div>
+    <div class="field">
+      <label for="bYear">생년월일 (숫자로 직접 입력)</label>
+      <div class="birth-row">
+        <input type="tel" id="bYear" inputmode="numeric" placeholder="1974" maxlength="4" aria-label="태어난 해 4자리">
+        <span class="bu">년</span>
+        <input type="tel" id="bMonth" inputmode="numeric" placeholder="1" maxlength="2" aria-label="태어난 월">
+        <span class="bu">월</span>
+        <input type="tel" id="bDay" inputmode="numeric" placeholder="15" maxlength="2" aria-label="태어난 일">
+        <span class="bu">일</span>
       </div>
-      <div class="field">
+    </div>
+    <div class="row">
+      <div class="field" style="flex:0.7;">
         <label for="calType">양력 / 음력</label>
         <select id="calType">
           <option value="solar" selected>양력</option>
           <option value="lunar">음력</option>
         </select>
       </div>
-    </div>
-    <div class="field">
-      <label for="userName">이름 (선택 — 넣으면 더 나만의 운세가 됩니다)</label>
-      <input type="text" id="userName" placeholder="예: 주열" maxlength="12">
+      <div class="field">
+        <label for="userName">이름 (선택)</label>
+        <input type="text" id="userName" placeholder="예: 주열" maxlength="12">
+      </div>
     </div>
     <button id="revealBtn">오늘 운세 카드 뽑기</button>
   </div>
