@@ -60,6 +60,14 @@
     font-family:inherit;
   }
   .field input:focus,.field select:focus{border-color:var(--gold);}
+  .birth-row{display:flex;align-items:center;gap:6px;}
+  .birth-row input{
+    text-align:center;padding:11px 4px;
+    font-variant-numeric:tabular-nums;
+  }
+  #bYear{flex:1.6;min-width:74px;}
+  #bMonth,#bDay{flex:1;min-width:48px;}
+  .bu{color:var(--dim);font-size:14px;flex-shrink:0;}
   #revealBtn{
     font-family:inherit;font-size:17px;font-weight:800;letter-spacing:2px;
     padding:15px;border-radius:12px;border:none;cursor:pointer;color:#1a1200;
@@ -180,9 +188,16 @@
 
   <div class="inputs" id="inputBox">
     <div class="row">
-      <div class="field">
-        <label for="birth">생년월일</label>
-        <input type="date" id="birth">
+      <div class="field" style="flex:2.2;">
+        <label for="bYear">생년월일 (숫자로 직접 입력)</label>
+        <div class="birth-row">
+          <input type="tel" id="bYear" inputmode="numeric" placeholder="1974" maxlength="4" aria-label="태어난 해 4자리">
+          <span class="bu">년</span>
+          <input type="tel" id="bMonth" inputmode="numeric" placeholder="1" maxlength="2" aria-label="태어난 월">
+          <span class="bu">월</span>
+          <input type="tel" id="bDay" inputmode="numeric" placeholder="15" maxlength="2" aria-label="태어난 일">
+          <span class="bu">일</span>
+        </div>
       </div>
       <div class="field">
         <label for="calType">양력 / 음력</label>
@@ -533,13 +548,38 @@
   // 저장된 입력 복원
   var saved={};
   try{ saved=JSON.parse(store.get("fortune_me")||"{}"); }catch(e){}
-  if(saved.birth) document.getElementById("birth").value=saved.birth;
+  if(saved.birth){
+    document.getElementById("bYear").value=saved.birth.slice(0,4);
+    document.getElementById("bMonth").value=parseInt(saved.birth.slice(5,7),10)||"";
+    document.getElementById("bDay").value=parseInt(saved.birth.slice(8,10),10)||"";
+  }
   if(saved.cal) document.getElementById("calType").value=saved.cal;
   if(saved.name) document.getElementById("userName").value=saved.name;
 
+  // 숫자만 입력 + 자동 다음 칸 이동
+  var bY=document.getElementById("bYear"), bM=document.getElementById("bMonth"), bD=document.getElementById("bDay");
+  [[bY,4,bM],[bM,2,bD],[bD,2,null]].forEach(function(cfg){
+    var el=cfg[0], max=cfg[1], next=cfg[2];
+    el.addEventListener("input",function(){
+      el.value=el.value.replace(/\D/g,"").slice(0,max);
+      if(next && el.value.length===max) next.focus();
+    });
+  });
+
+  function readBirth(){
+    var y=parseInt(bY.value,10), m=parseInt(bM.value,10), d=parseInt(bD.value,10);
+    var nowY=new Date().getFullYear();
+    if(!y||!m||!d){ alert("생년월일을 숫자로 입력해 주세요. 예) 1974년 1월 15일"); return null; }
+    if(y<1900||y>nowY){ alert("태어난 해를 4자리로 입력해 주세요. 예) 1974"); bY.focus(); return null; }
+    if(m<1||m>12){ alert("월은 1~12 사이로 입력해 주세요."); bM.focus(); return null; }
+    var lastDay=new Date(y,m,0).getDate();
+    if(d<1||d>lastDay){ alert(y+"년 "+m+"월은 "+lastDay+"일까지 있습니다. 일을 다시 확인해 주세요."); bD.focus(); return null; }
+    return y+"-"+String(m).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+  }
+
   document.getElementById("revealBtn").addEventListener("click",function(){
-    var birth=document.getElementById("birth").value;
-    if(!birth){ alert("생년월일을 입력해 주세요!"); return; }
+    var birth=readBirth();
+    if(!birth) return;
     var cal=document.getElementById("calType").value;
     var name=document.getElementById("userName").value.trim();
     store.set("fortune_me",JSON.stringify({birth:birth,cal:cal,name:name}));
