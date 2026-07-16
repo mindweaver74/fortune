@@ -150,6 +150,14 @@
   #resetBtn:hover{color:var(--text);border-color:#3d4a85;}
   .actions.hidden,.stage.hidden{display:none;}
 
+  .about{
+    margin-top:38px;padding-top:8px;border-top:1px solid var(--line);
+  }
+  .about h2{font-size:17px;font-weight:800;margin:22px 0 10px;color:var(--text);}
+  .about h3{font-size:14px;font-weight:700;margin:18px 0 8px;color:var(--gold);}
+  .about p{font-size:13px;color:var(--dim);line-height:1.85;}
+  .about strong{color:var(--text);font-weight:700;}
+
   footer{margin-top:34px;text-align:center;font-size:12px;color:var(--dim);line-height:1.9;}
   footer a{color:var(--dim);}
   footer a:hover{color:var(--text);}
@@ -207,6 +215,17 @@
     <button id="saveBtn">📷 이미지 저장</button>
     <button id="resetBtn">다른 사람 운세 보기</button>
   </div>
+
+  <section class="about">
+    <h2>🔮 운세가 궁금하지?는 어떤 도구인가요</h2>
+    <p>생년월일만 입력하면 <strong>오늘의 총운 점수와 등급, 금전운·애정운·건강운 별점, 행운의 로또 번호</strong>까지 한 장의 카드로 보여주는 무료 운세 도구입니다. 회원가입이나 설치 없이 브라우저에서 바로 사용할 수 있습니다.</p>
+    <h3>사용 방법</h3>
+    <p>① 생년월일을 입력하고 양력/음력을 선택합니다 (이름은 선택 사항). ② "오늘 운세 카드 뽑기"를 누르면 신비로운 카드가 나타납니다. ③ 카드를 탭해서 뒤집으면 오늘의 운세가 공개됩니다. 마음에 들면 이미지로 저장해 친구와 공유해 보세요.</p>
+    <h3>운세는 어떻게 만들어지나요</h3>
+    <p>입력한 생년월일과 오늘 날짜를 조합해 그날의 운세를 생성합니다. 그래서 <strong>같은 사람은 하루 종일 같은 결과</strong>가 나오고, 자정이 지나면 새로운 운세로 바뀝니다. 행운의 로또 번호는 생년 천간의 오행(五行)과 상생하는 수리오행 번호에 가중치를 주는 전통적 재미 요소를 적용했습니다. 양력 선택 시에는 사주의 연도 기준인 입춘(2월 4일경) 이전 출생자에게 전년도 천간을 적용합니다.</p>
+    <h3>개인정보는 안전한가요</h3>
+    <p>입력한 생년월일과 이름은 <strong>내 브라우저에만 저장</strong>되며 서버로 전송되지 않습니다. 다음 방문 때 다시 입력하지 않도록 기억해 두는 용도로만 쓰입니다.</p>
+  </section>
 
   <footer>
     이 운세는 재미로 즐기는 콘텐츠입니다. 오늘 하루의 작은 웃음이 되길 바라요 🍀<br>
